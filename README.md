@@ -1,6 +1,6 @@
 # Acc-Timing
 Accurate timing adjustment for Spiking Neural Network
-Design the architecture firstly:
+1.Design the architecture:
 Network
     Layers
         Conv
@@ -24,3 +24,8 @@ Network
 Neuron (autograd)
     Forward
     Backward
+
+2.Configurations
+Network config
+Layers config
+
