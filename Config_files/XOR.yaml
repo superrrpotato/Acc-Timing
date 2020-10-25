@@ -1,0 +1,23 @@
+Network:
+  epochs: 10
+  batch_size: 10
+  n_steps: 5
+  dataset: "XOR"
+  rule: "ATBP"
+  data_path: "./datasets/XOR"
+  lr: 0.001
+  loss: "kernel"
+  tau_m: 5
+  tau_s: 2
+  model: "LIF"
+  threshold: 1
+
+Layers:
+  FC_1:
+    type: "linear"
+    n_inputs: 2
+    n_outputs: 4
+  FC_2:
+    type: "linear"
+    n_inpyts: 4
+    n_outputs: 1
