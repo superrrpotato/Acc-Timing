@@ -24,8 +24,16 @@ if __name__ == '__main__':
     params = parse(config_path)
     logging.info("finish parsing settings")
     glv.init(params)
-    logging.info("dataset loaded")
+    logging.info("start loading dataset")
     if params['Network']['dataset'] == "MNIST":
         data_path = os.path.expanduser(params['Network']['data_path'])
         train_loader, test_loader = loadMNIST.get_mnist(data_path,\
                 params['Network'])
+    elif params['Network']['dataset'] == "XOR"
+        data_path = os.path.expanduser(params['Network']['data_path'])
+        train_loader, test_loader = loadXOR.get_XOR(data_path,\
+                params['Network'])
+    else:
+        raise Exception('Unrecognized dataset name.')
+    logging.info("dataset loaded")
+
