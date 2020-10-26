@@ -1,6 +1,7 @@
 import torch
 from network_parser import parse
 from datasets import loadMNIST, loadXOR
+from utils import learningStats
 import cnns
 import argparse
 
@@ -30,10 +31,20 @@ if __name__ == '__main__':
         train_loader, test_loader = loadMNIST.get_mnist(data_path,\
                 params['Network'])
     elif params['Network']['dataset'] == "XOR"
-        data_path = os.path.expanduser(params['Network']['data_path'])
-        train_loader, test_loader = loadXOR.get_XOR(data_path,\
-                params['Network'])
+        train_loader, test_loader = loadXOR.get_XOR(params['Network'])
     else:
         raise Exception('Unrecognized dataset name.')
     logging.info("dataset loaded")
+    net = cnns.Network(params['Network'], params['Layers'],\
+            list(train_loader.dataset[0][0].shape)).to(device)
+    if args.checkpoint is not None:
+        checkpoint_path = args.checkpoint
+        checkpoint = torch.load(checkpoint_path)
+        net.load_state_dict(checkpoint['net'])
+    error = loss_f.SpikeLoss(params['Network']).to(device)
+    optimizer = torch.optim.AdamW(net.get_parameters(),\
+            lr=params['Network']['lr'], betas=(0.9, 0.999))
+    best_acc = 0
+    best_epoch = 0
+
 
