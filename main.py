@@ -4,6 +4,46 @@ from datasets import loadMNIST, loadXOR
 from utils import learningStats
 import cnns
 import argparse
+import loss
+import logging
+
+max_accuracu = 0
+min_loss = 1000
+
+def train(network, trainloader, opti, epoch, states, network_config,\
+        layers_config, err):
+    global max_accuracy
+    global min_loss
+    logging.info('\nEpoch: %d', epoch)
+    train_loss = correct = total = 0
+    n_steps = network_config['n_steps']
+    n_class = network_config['n_class']
+    batch_size = network_config['batch_size']
+    time = datetime.now()
+    des_str = "Training @ epoch " + str(epoch)
+     for batch_idx, (inputs, labels) in enumerate(trainloader):
+         if network_config["rule"] == "ATBP":
+             if len(iniputs.shape) < 5:
+                 iniputs = inputs.unsqueeze_(-1).repeat(1, 1, 1, 1, n_steps)
+            labels = labels.to(device)
+            inputs = inputs.to(device)
+            inputs.type(dtype)
+            outputs = network.forward(inputs, epoch, True)
+            if network_config['loss'] == "average":
+                loss = err.average(outputs, target)
+            opti.zero_grad()
+            loss.backward()
+            opti.step()
+            train_loss += torch.sum(loss).item()
+            total += len(labels)
+        else:
+            raise Exception('Unrecognized rule name.')
+        states.training.lossSum += loss.cpu().data.item()
+        states.print(epoch, batch_idx, (datetime.now()-time).total_seconds())
+    total_loss = train_loss/total
+    if total_loss < min_loss:
+        min_loss = total_loss
+    logging.info("Training Loss:  %.3f (%.3f)\n", total_loss, min_loss)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -41,7 +81,7 @@ if __name__ == '__main__':
         checkpoint_path = args.checkpoint
         checkpoint = torch.load(checkpoint_path)
         net.load_state_dict(checkpoint['net'])
-    error = loss_f.SpikeLoss(params['Network']).to(device)
+    error = loss.SpikeLoss(params['Network']).to(device)
     optimizer = torch.optim.AdamW(net.get_parameters(),\
             lr=params['Network']['lr'], betas=(0.9, 0.999))
     best_acc = 0
@@ -52,8 +92,8 @@ if __name__ == '__main__':
         train(net, train_loader, optimizer, e, l_states,\
                 params['Network'], params['Layers'], error)
         l_states.training.update()
-        l_states.testing.reset()
-        test(net, test_loader, e, l_states, params['Network'],\
-                params['Layers'])
-        l_states.testing.update()
-    logging.info("Best Accuracy: %.3f, at epoch: %d \n", best_acc, best_epoch)
+#        l_states.testing.reset()
+#        test(net, test_loader, e, l_states, params['Network'],\
+#                params['Layers'])
+#        l_states.testing.update()
+#    logging.info("Best Accuracy: %.3f, at epoch: %d \n", best_acc, best_epoch)
