@@ -35,7 +35,7 @@ class Neuron(torch.autograd.Function):
         for t in range(n_steps):
             mem_update = (-theta_m) * mem + inputs[..., t]
             mem += mem_update
-            out = (mem > threshold).type(glv.dtypo)
+            out = (mem > threshold).type(glv.dtype)
             mems.append(mem)
             mem = mem * (1-out)
             outputs.append(out)

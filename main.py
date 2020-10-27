@@ -32,6 +32,7 @@ def train(network, trainloader, opti, epoch, states, network_config,\
              inputs.type(glv.dtype)
              outputs = network.forward(inputs, epoch, True)
              if network_config['loss'] == "average":
+                 target = labels
                  loss = err.average(outputs, target)
              opti.zero_grad()
              loss.backward()
@@ -40,6 +41,7 @@ def train(network, trainloader, opti, epoch, states, network_config,\
              total += len(labels)
          else:
              raise Exception('Unrecognized rule name.')
+         states.training.numSamples = total
          states.training.lossSum += loss.cpu().data.item()
          states.print(epoch, batch_idx, (datetime.now()-time).total_seconds())
     total_loss = train_loss/total

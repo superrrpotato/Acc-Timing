@@ -55,15 +55,15 @@ class learningStats():
         epochStr = 'Epoch : %10d' % (epoch)
         iterStr = '' if iter is None else '(i = %7d)' % (iter)
         profileStr = '' if timeElapsed is None else ', %12.4f s elapsed' %\
-        timeElapsed
+            timeElapsed
         if header is not None:
             for h in header:
                 print('\033[2K' + str(h))
                 self.linesPrinted += 1
         print(epochStr + iterStr + profileStr)
         print(self.training.displayString())
-        print(self.testing.displayString())
-        self.linesPrinted += 3
+        #print(self.testing.displayString())
+        self.linesPrinted += 2
         if footer is not None:
             for f in footer:
                 print('\033[2K' + str(f))
