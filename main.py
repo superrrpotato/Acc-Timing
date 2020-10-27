@@ -46,5 +46,14 @@ if __name__ == '__main__':
             lr=params['Network']['lr'], betas=(0.9, 0.999))
     best_acc = 0
     best_epoch = 0
-
-
+    l_states = learningStats()
+    for e in range(params['Network']['epochs']):
+        l_states.training.reset()
+        train(net, train_loader, optimizer, e, l_states,\
+                params['Network'], params['Layers'], error)
+        l_states.training.update()
+        l_states.testing.reset()
+        test(net, test_loader, e, l_states, params['Network'],\
+                params['Layers'])
+        l_states.testing.update()
+    logging.info("Best Accuracy: %.3f, at epoch: %d \n", best_acc, best_epoch)
