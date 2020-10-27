@@ -1,6 +1,21 @@
 import torch
 import global_v as glv
 
+
+def psp(inputs, network_config):
+    shape = inputs.shape
+    n_steps = network_config['n_steps']
+    tau_s = network_config['tau_s']
+    syn = torch.zeros((shape[0], shape[1], shape[2], shape[3]),\
+            dtype=glv.dtype, device=glv.device)
+    syns = torch.zeros((shape[0], shape[1], shape[2], shape[3], n_steps),\
+            dtype=glv.dtype, device=glv.device)
+    for t in range(n_steps):
+        syn = syn - syn / tau_s + inputs[..., t]
+        syns[..., t] = syn / tau_s
+    return syns
+
+
 class Neuron(torch.autograd.Function):
     @staticmethod
     def forward(ctx, inputs):

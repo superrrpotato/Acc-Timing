@@ -1,12 +1,12 @@
 import torch
-
-class XORDataset(data.Dataset):
+from torch.utils.data import Dataset, DataLoader
+class XORDataset(Dataset):
     def __init__(self, train=True):
         self.train = train
     def __getitem__(self, index):
         data = torch.rand(2)
         (x, y) = data
-        def sigmoid(x,t=0.15):return 1/(1+np.exp(-x/t))
+        def sigmoid(x,t=0.15):return 1/(1+torch.exp(-x/t))
         def XOR(x,y):return -4*(sigmoid(x)-0.5)*(sigmoid(y)-0.5)
         label = XOR(x,y)
         return data, label
@@ -18,8 +18,8 @@ def get_XOR(network_config):
     batch_size = network_config['batch_size']
     trainset = XORDataset(train=True)
     testset = XORDataset(train=False)
-    trainloader = torch.utils.data.DataLoader(trainset,\
-            batch_size=batch_size, shuule=False, num_workers=4)
-    testloader = torch.utils.data.DataLoader(testset,\
-            batch_size=batch_size, shuule=False, num_workers=4)
+    trainloader = DataLoader(trainset, batch_size=batch_size,\
+            shuffle=False, num_workers=4)
+    testloader = DataLoader(testset, batch_size=batch_size,\
+            shuffle=False, num_workers=4)
     return trainloader, testloader

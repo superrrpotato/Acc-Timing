@@ -2,11 +2,12 @@ import torch
 import torch.nn as nn
 import layers.linear as linear
 import global_v as glv
-import Neurons as f
+import Neuron as f
 
 class Network(nn.Module):
-    def __init(self, network_config, layers_config, input_shape)
+    def __init__(self, network_config, layers_config, input_shape):
         super(Network, self).__init__()
+        self.layers = []
         self.network_config = network_config
         self.layers_config = layers_config
         parameters = []

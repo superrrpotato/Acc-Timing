@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as f
 import Neuron as Neuron
 
 class LinearLayer(nn.Linear):

@@ -1,7 +1,9 @@
 import torch
+import global_v as glv
 from network_parser import parse
 from datasets import loadMNIST, loadXOR
 from utils import learningStats
+from datetime import datetime
 import cnns
 import argparse
 import loss
@@ -17,29 +19,29 @@ def train(network, trainloader, opti, epoch, states, network_config,\
     logging.info('\nEpoch: %d', epoch)
     train_loss = correct = total = 0
     n_steps = network_config['n_steps']
-    n_class = network_config['n_class']
+#    n_class = network_config['n_class']
     batch_size = network_config['batch_size']
     time = datetime.now()
     des_str = "Training @ epoch " + str(epoch)
-     for batch_idx, (inputs, labels) in enumerate(trainloader):
+    for batch_idx, (inputs, labels) in enumerate(trainloader):
          if network_config["rule"] == "ATBP":
-             if len(iniputs.shape) < 5:
-                 iniputs = inputs.unsqueeze_(-1).repeat(1, 1, 1, 1, n_steps)
-            labels = labels.to(device)
-            inputs = inputs.to(device)
-            inputs.type(dtype)
-            outputs = network.forward(inputs, epoch, True)
-            if network_config['loss'] == "average":
-                loss = err.average(outputs, target)
-            opti.zero_grad()
-            loss.backward()
-            opti.step()
-            train_loss += torch.sum(loss).item()
-            total += len(labels)
-        else:
-            raise Exception('Unrecognized rule name.')
-        states.training.lossSum += loss.cpu().data.item()
-        states.print(epoch, batch_idx, (datetime.now()-time).total_seconds())
+             if len(inputs.shape) < 5:
+                 inputs = inputs.unsqueeze_(-1).repeat(1, 1, 1, 1, n_steps)
+             labels = labels.to(glv.device)
+             inputs = inputs.to(glv.device)
+             inputs.type(glv.dtype)
+             outputs = network.forward(inputs, epoch, True)
+             if network_config['loss'] == "average":
+                 loss = err.average(outputs, target)
+             opti.zero_grad()
+             loss.backward()
+             opti.step()
+             train_loss += torch.sum(loss).item()
+             total += len(labels)
+         else:
+             raise Exception('Unrecognized rule name.')
+         states.training.lossSum += loss.cpu().data.item()
+         states.print(epoch, batch_idx, (datetime.now()-time).total_seconds())
     total_loss = train_loss/total
     if total_loss < min_loss:
         min_loss = total_loss
@@ -70,18 +72,18 @@ if __name__ == '__main__':
         data_path = os.path.expanduser(params['Network']['data_path'])
         train_loader, test_loader = loadMNIST.get_mnist(data_path,\
                 params['Network'])
-    elif params['Network']['dataset'] == "XOR"
+    elif params['Network']['dataset'] == "XOR":
         train_loader, test_loader = loadXOR.get_XOR(params['Network'])
     else:
         raise Exception('Unrecognized dataset name.')
     logging.info("dataset loaded")
     net = cnns.Network(params['Network'], params['Layers'],\
-            list(train_loader.dataset[0][0].shape)).to(device)
+            list(train_loader.dataset[0][0].shape)).to(glv.device)
     if args.checkpoint is not None:
         checkpoint_path = args.checkpoint
         checkpoint = torch.load(checkpoint_path)
         net.load_state_dict(checkpoint['net'])
-    error = loss.SpikeLoss(params['Network']).to(device)
+    error = loss.SpikeLoss(params['Network']).to(glv.device)
     optimizer = torch.optim.AdamW(net.get_parameters(),\
             lr=params['Network']['lr'], betas=(0.9, 0.999))
     best_acc = 0

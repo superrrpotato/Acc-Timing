@@ -10,6 +10,8 @@ def init(params):
         c_device = aboutCudaDevices()
         print(c_device.info())
         print("selected device: ", device)
+    else:
+        device = 'cpu'
     dtype = torch.float32
     network_config = params['Network']
     n_steps = network_config['n_steps']

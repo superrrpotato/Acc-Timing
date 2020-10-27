@@ -19,5 +19,5 @@ Layers:
     n_outputs: 4
   FC_2:
     type: "linear"
-    n_inpyts: 4
+    n_inputs: 4
     n_outputs: 1
