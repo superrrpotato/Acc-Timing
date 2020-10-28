@@ -48,7 +48,7 @@ class learningStats():
         self.training.reset()
         self.testing.update()
         self.testing.reset()
-    def print(self, epoch, iter=None, timeElapsed=None, header=None,\
+    def print(self, epoch, iter=None, timeElapsed=None, lr=None, header=None,\
             footer=None):
         print('\033[%dA' % (self.linesPrinted))
         self.linesPrinted = 1
@@ -56,11 +56,12 @@ class learningStats():
         iterStr = '' if iter is None else '(i = %7d)' % (iter)
         profileStr = '' if timeElapsed is None else ', %12.4f s elapsed' %\
             timeElapsed
+        lrStr = '' if lr is None else '    LearningRate : %3.8f' % lr
         if header is not None:
             for h in header:
                 print('\033[2K' + str(h))
                 self.linesPrinted += 1
-        print(epochStr + iterStr + profileStr)
+        print(epochStr + iterStr + profileStr + lrStr)
         print(self.training.displayString())
         #print(self.testing.displayString())
         self.linesPrinted += 2

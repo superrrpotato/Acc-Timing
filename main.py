@@ -43,7 +43,8 @@ def train(network, trainloader, opti, epoch, states, network_config,\
              raise Exception('Unrecognized rule name.')
          states.training.numSamples = total
          states.training.lossSum += loss.cpu().data.item()
-         states.print(epoch, batch_idx, (datetime.now()-time).total_seconds())
+         states.print(epoch, batch_idx, (datetime.now()-time).total_seconds(),\
+                 opti.param_groups[0]['lr'])
     total_loss = train_loss/total
     if total_loss < min_loss:
         min_loss = total_loss
@@ -91,11 +92,16 @@ if __name__ == '__main__':
     best_acc = 0
     best_epoch = 0
     l_states = learningStats()
+    decayRate = params['Network']['lr_dacay']
+    my_lr_scheduler =\
+    torch.optim.lr_scheduler.ExponentialLR(optimizer=optimizer,\
+            gamma=decayRate)
     for e in range(params['Network']['epochs']):
         l_states.training.reset()
         train(net, train_loader, optimizer, e, l_states,\
                 params['Network'], params['Layers'], error)
         l_states.training.update()
+        my_lr_scheduler.step()
 #        l_states.testing.reset()
 #        test(net, test_loader, e, l_states, params['Network'],\
 #                params['Layers'])

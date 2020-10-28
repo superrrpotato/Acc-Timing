@@ -9,7 +9,7 @@ class XORDataset(Dataset):
         def sigmoid(x,t=0.15):return 1/(1+torch.exp(-x/t))
         def XOR(x,y):return -4*(sigmoid(x)-0.5)*(sigmoid(y)-0.5)
         label = XOR(x,y)
-        return data, label
+        return data.view(1,1,2), label
     def __len__(self):
         return 5000 if self.train else 1000
 

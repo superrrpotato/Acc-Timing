@@ -11,11 +11,11 @@ Network:
   tau_s: 2
   model: "LIF"
   threshold: 1
-
+  lr_dacay: 0.9
 Layers:
   FC_1:
     type: "linear"
-    n_inputs: 20
+    n_inputs: 2
     n_outputs: 4
   FC_2:
     type: "linear"
