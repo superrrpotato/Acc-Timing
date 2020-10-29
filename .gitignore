@@ -1,3 +1,5 @@
 **/mnist
 __pycache__/
 **.log
+**.ipynb
+.ipynb_checkpoints/
