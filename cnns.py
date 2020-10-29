@@ -38,7 +38,7 @@ class Network(nn.Module):
             else:
                 raise Exception('Unrecognized rule type. It is:\
                 {}'.format(self.network_config['rule']))
-            return spikes
+        return spikes
     def get_parameters(self):
         return self.my_parameters
     def weight_clipper(self):

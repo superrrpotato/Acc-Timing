@@ -5,30 +5,21 @@ import Neuron as Neuron
 
 class LinearLayer(nn.Linear):
     def __init__(self, config, name, in_shape):
-        in_features = config['n_inputs']
-        out_features = config['n_outputs']
-        self.layer_config = config
-        self.name = name
-        self.type = config['type']
+        n_inputs = config['n_inputs']
+        n_outputs = config['n_outputs']
         self.in_shape = in_shape
-        self.out_shape = [out_features, 1, 1]
+        self.out_shape = [n_outputs, 1, 1]
         self.in_spikes = None
         self.out_spikes = None
-        if type(in_features) == int:
-            n_inputs = in_features
-        else:
-            raise Exception('inFeatures should not be more than 1 dimesnion.\
-            It was: {}'.format(in_features.shape))
-        if type(out_features) == int:
-            n_outputs = out_features
-        else:
-            raise Exception('outFeatures should not be more than 1 dimesnion.\
-                    It was: {}'.format(out_features.shape))
+        assert(type(n_inputs) == int)
+        assert(type(n_outputs) == int)
         super(LinearLayer, self).__init__(n_inputs, n_outputs, bias=False)
         nn.init.normal_(self.weight)
+#        nn.init.zeros_(self.bias)
         self.weight = torch.nn.Parameter(self.weight, requires_grad=True)
+#        self.bias = torch.nn.Parameter(self.bias, requires_grad=True)
         print("linear")
-        print(self.name)
+        print(name)
         print(self.in_shape)
         print(self.out_shape)
         print(list(self.weight.shape))
