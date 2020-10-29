@@ -1,5 +1,5 @@
 Network:
-  epochs: 10
+  epochs: 50
   batch_size: 10
   n_steps: 5
   dataset: "XOR"
@@ -11,13 +11,13 @@ Network:
   tau_s: 2
   model: "LIF"
   threshold: 1
-  lr_dacay: 0.9
+  lr_dacay: 0.96
 Layers:
   FC_1:
     type: "linear"
     n_inputs: 2
-    n_outputs: 4
+    n_outputs: 40
   FC_2:
     type: "linear"
-    n_inputs: 4
+    n_inputs: 40
     n_outputs: 1

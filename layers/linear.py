@@ -42,7 +42,7 @@ class LinearLayer(nn.Linear):
         y = y.transpose(1, 2)
         y = y.view(y.shape[0], y.shape[1], 1, 1, y.shape[2])
         return y
-    def forward_pass(self, x, epoch):
+    def forward_pass(self, x):
         y = self.forward(x)
         y = Neuron.Neuron.apply(y)
         return y

@@ -24,27 +24,27 @@ def train(network, trainloader, opti, epoch, states, network_config,\
     time = datetime.now()
     des_str = "Training @ epoch " + str(epoch)
     for batch_idx, (inputs, labels) in enumerate(trainloader):
-         if network_config["rule"] == "ATBP":
-             if len(inputs.shape) < 5:
-                 inputs = inputs.unsqueeze_(-1).repeat(1, 1, 1, 1, n_steps)
-             labels = labels.to(glv.device)
-             inputs = inputs.to(glv.device)
-             inputs.type(glv.dtype)
-             outputs = network.forward(inputs, epoch, True)
-             if network_config['loss'] == "average":
-                 target = labels
-                 loss = err.average(outputs, target)
-             opti.zero_grad()
-             loss.backward()
-             opti.step()
-             train_loss += torch.sum(loss).item()
-             total += len(labels)
-         else:
-             raise Exception('Unrecognized rule name.')
-         states.training.numSamples = total
-         states.training.lossSum += loss.cpu().data.item()
-         states.print(epoch, batch_idx, (datetime.now()-time).total_seconds(),\
-                 opti.param_groups[0]['lr'])
+        if network_config["rule"] == "ATBP":
+            if len(inputs.shape) < 5:
+                inputs = inputs.unsqueeze_(-1).repeat(1, 1, 1, 1, n_steps)
+            labels = labels.to(glv.device)
+            inputs = inputs.to(glv.device)
+            inputs.type(glv.dtype)
+            outputs = network.forward(inputs, True)
+            if network_config['loss'] == "average":
+                target = labels
+                loss = err.average(outputs, target)
+            opti.zero_grad()
+            loss.backward()
+            opti.step()
+            train_loss += torch.sum(loss).item()
+            total += len(labels)
+        else:
+            raise Exception('Unrecognized rule name.')
+        states.training.numSamples = total
+        states.training.lossSum += loss.cpu().data.item()
+        states.print(epoch, batch_idx, (datetime.now()-time).total_seconds(),\
+                opti.param_groups[0]['lr'])
     total_loss = train_loss/total
     if total_loss < min_loss:
         min_loss = total_loss

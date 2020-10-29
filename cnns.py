@@ -25,7 +25,7 @@ class Network(nn.Module):
         self.my_parameters = nn.ParameterList(parameters)
         print("-----------------------------------------")
 
-    def forward(self, spike_input, epoch, is_train):
+    def forward(self, spike_input, is_train):
         spikes = f.psp(spike_input, self.network_config)
         skip_spikes = {}
         assert self.network_config['model'] == "LIF"
@@ -34,7 +34,7 @@ class Network(nn.Module):
                 if is_train:
                     spikes = self.layers[i](spikes)
             elif self.network_config["rule"] == "ATBP":
-                spikes = self.layers[i].forward_pass(spikes, epoch)
+                spikes = self.layers[i].forward_pass(spikes)
             else:
                 raise Exception('Unrecognized rule type. It is:\
                 {}'.format(self.network_config['rule']))
