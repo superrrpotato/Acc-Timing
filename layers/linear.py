@@ -2,15 +2,16 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as f
 import Neuron as Neuron
+import os,sys,inspect
+current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parent_dir = os.path.dirname(current_dir)
+sys.path.insert(0, parent_dir)
+import global_v as glv
 
 class LinearLayer(nn.Linear):
-    def __init__(self, config, name, in_shape):
+    def __init__(self, config, name):
         n_inputs = config['n_inputs']
         n_outputs = config['n_outputs']
-        self.in_shape = in_shape
-        self.out_shape = [n_outputs, 1, 1]
-        self.in_spikes = None
-        self.out_spikes = None
         assert(type(n_inputs) == int)
         assert(type(n_outputs) == int)
         super(LinearLayer, self).__init__(n_inputs, n_outputs, bias=False)
@@ -20,9 +21,9 @@ class LinearLayer(nn.Linear):
 #        self.bias = torch.nn.Parameter(self.bias, requires_grad=True)
         print("linear")
         print(name)
-        print(self.in_shape)
-        print(self.out_shape)
-        print(list(self.weight.shape))
+        print("input shape:", [glv.batch_size, n_inputs, 1, 1, glv.n_steps])
+        print("weight shape: ", list(self.weight.shape)[::-1])
+        print("output shape:", [glv.batch_size, n_outputs, 1, 1, glv.n_steps])
         print("-----------------------------------------")
 
     def forward(self, x):

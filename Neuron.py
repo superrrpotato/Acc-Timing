@@ -71,7 +71,7 @@ class Neuron(torch.autograd.Function):
                     torch.einsum('...ij, ...j -> ...i',partial_a_inter,\
                         grad_delta[i*mini_batch:(i+1)*mini_batch, ...])
         if torch.sum(outputs)/(shape[0] * shape[1] * shape[2] * shape[3] *\
-                shape[4]) > 0.1:
+                shape[4]) > 1:
             partial_u = torch.clamp(1 / delta_u, -10, 10) * outputs
             grad = grad_a * partial_u
         else:

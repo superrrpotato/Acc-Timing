@@ -4,12 +4,12 @@ class XORDataset(Dataset):
     def __init__(self, train=True):
         self.train = train
     def __getitem__(self, index):
-        data = torch.rand(2)
+        data = 2*(torch.rand(2)-0.5)
         (x, y) = data
         def sigmoid(x,t=0.15):return 1/(1+torch.exp(-x/t))
         def XOR(x,y):return -4*(sigmoid(x)-0.5)*(sigmoid(y)-0.5)
         label = XOR(x,y)
-        return data.view(1,1,2), label
+        return data.view(2,1,1), label
     def __len__(self):
         return 5000 if self.train else 1000
 
