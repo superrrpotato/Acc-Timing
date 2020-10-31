@@ -14,10 +14,12 @@ Network:
   lr_dacay: 0.9
 Layers:
   FC_1:
+    layer_name: "FC_1"
     type: "linear"
     n_inputs: 2
     n_outputs: 40
   FC_2:
+    layer_name: "FC_2"
     type: "linear"
     n_inputs: 40
     n_outputs: 1

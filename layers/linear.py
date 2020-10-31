@@ -12,6 +12,7 @@ class LinearLayer(nn.Linear):
     def __init__(self, config, name):
         n_inputs = config['n_inputs']
         n_outputs = config['n_outputs']
+        self.config = config
         assert(type(n_inputs) == int)
         assert(type(n_outputs) == int)
         super(LinearLayer, self).__init__(n_inputs, n_outputs, bias=False)
@@ -36,7 +37,7 @@ class LinearLayer(nn.Linear):
         return y
     def forward_pass(self, x):
         y = self.forward(x)
-        y = Neuron.Neuron.apply(y)
+        y = Neuron.Neuron.apply(y, self.config)
         return y
     def get_parameters(self):
         return self.weight

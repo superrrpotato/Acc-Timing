@@ -1,5 +1,6 @@
 **/mnist
 __pycache__/
+figs/
 **.log
 **.swp
 **.ipynb

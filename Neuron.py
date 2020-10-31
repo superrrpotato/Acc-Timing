@@ -18,7 +18,7 @@ def psp(inputs, network_config):
 
 class Neuron(torch.autograd.Function):
     @staticmethod
-    def forward(ctx, inputs):
+    def forward(ctx, inputs, layer_config):
         shape = inputs.shape
         n_steps = glv.n_steps
         theta_m = glv.theta_m
@@ -46,15 +46,22 @@ class Neuron(torch.autograd.Function):
         mem_updates = torch.stack(mem_updates, dim = 4)
         syns = torch.stack(syns, dim = 4)
         outputs = torch.stack(outputs, dim = 4)
-        ctx.save_for_backward(mem_updates, outputs, mems)
+        if layer_config['layer_name'] not in glv.name_list:
+            glv.name_list = glv.name_list + [layer_config['layer_name']]
+        glv.mem_p_stat_ori[layer_config['layer_name']] = mems
+        glv.output_stat_ori[layer_config['layer_name']] = syns.detach().numpy()
+        index = torch.tensor(glv.name_list.index(layer_config['layer_name']))
+        ctx.save_for_backward(mem_updates, outputs, mems, index)
         return syns
 
     @staticmethod
     def backward(ctx, grad_delta):
-        (delta_u, outputs, u) = ctx.saved_tensors
+        (delta_u, outputs, u, index) = ctx.saved_tensors
+        layer_name = glv.name_list[index]
         shape = outputs.shape
         n_steps = glv.n_steps
         threshold = glv.threshold
+        glv.error_stat[layer_name] = grad_delta
         grad_a = torch.empty_like(delta_u)
         if shape[4] > shape[0] * 10:
             for t in range(n_steps):
@@ -80,7 +87,8 @@ class Neuron(torch.autograd.Function):
             f = torch.exp(f)
             f = f / ((1 + f) * (1 + f) * a)
             grad = grad_a * f
-        return grad
+        glv.grad_stat[layer_name] = grad
+        return grad, None
 
 
 
