@@ -27,16 +27,13 @@ class LinearLayer(nn.Linear):
         print("output shape:", [glv.batch_size, n_outputs, 1, 1, glv.n_steps])
         print("-----------------------------------------")
 
-    def forward(self, x):
+    def forward_pass(self, x):
         x = x.view(x.shape[0], x.shape[1] * x.shape[2] * x.shape[3],\
-                x.shape[4])
+            x.shape[4])
         x = x.transpose(1, 2)
         y = f.linear(x, self.weight, self.bias)
         y = y.transpose(1, 2)
         y = y.view(y.shape[0], y.shape[1], 1, 1, y.shape[2])
-        return y
-    def forward_pass(self, x):
-        y = self.forward(x)
         y = Neuron.Neuron.apply(y, self.config)
         return y
     def get_parameters(self):

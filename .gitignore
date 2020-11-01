@@ -3,6 +3,5 @@ __pycache__/
 figs/
 **.log
 **.swp
-**.ipynb
 .ipynb_checkpoints/
 checkpoint/
