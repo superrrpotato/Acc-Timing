@@ -82,7 +82,7 @@ class Neuron(torch.autograd.Function):
             partial_u = torch.clamp(1 / delta_u, -10, 10) * outputs
             grad = grad_a * partial_u
         else:
-            a = 0.2
+            a = 0.15
             f = torch.clamp((-1 * u + threshold) / a, -8, 8)
             f = torch.exp(f)
             f = f / ((1 + f) * (1 + f) * a)
