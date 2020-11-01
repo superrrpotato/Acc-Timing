@@ -2,19 +2,17 @@ import torch
 import global_v as glv
 from network_parser import parse
 from datasets import loadMNIST, loadXOR
-from utils import learningStats
+from utils import learningStats, EarlyStopping
 from datetime import datetime
 import cnns
 import argparse
 import loss
 import logging
 
-max_accuracu = 0
 min_loss = 1000
 
 def train(network, trainloader, opti, epoch, states, network_config,\
         layers_config, err):
-    global max_accuracy
     global min_loss
     logging.info('\nEpoch: %d', epoch)
     train_loss = correct = total = 0
@@ -42,13 +40,46 @@ def train(network, trainloader, opti, epoch, states, network_config,\
         else:
             raise Exception('Unrecognized rule name.')
         states.training.numSamples = total
-        states.training.lossSum += loss.cpu().data.item()
+        states.training.lossSum = train_loss
         states.print(epoch, batch_idx, (datetime.now()-time).total_seconds(),\
                 opti.param_groups[0]['lr'])
     total_loss = train_loss/total
     if total_loss < min_loss:
         min_loss = total_loss
     logging.info("Training Loss:  %.3f (%.3f)\n", total_loss, min_loss)
+
+def test(network, testloader, epoch, states, network_config, layers_config,\
+        error, early_stopping):
+    global best_acc
+    global best_epoch
+    total = test_loss = 0
+    n_steps = network_config['n_steps']
+    time = datetime.now()
+    des_str = "Testing @ epoch " + str(epoch)
+    with torch.no_grad():
+        for batch_idx, (inputs, labels) in enumerate(testloader):
+            if network_config["rule"] == "ATBP":
+                if len(inputs.shape) < 5:
+                    inputs = inputs.unsqueeze_(-1).repeat(1, 1, 1, 1, n_steps)
+                # forward pass
+                labels = labels.to(glv.device)
+                inputs = inputs.to(glv.device)
+                outputs = network.forward(inputs, False)
+                if network_config['loss'] == "average":
+                    target = labels
+                    loss = error.average(outputs,\
+                            target).detach().cpu()
+                total += len(labels)
+                test_loss += torch.sum(loss).item()
+            else:
+                raise Exception('Unrecognized rule name.')
+
+            states.testing.numSamples = total
+            states.testing.lossSum = test_loss
+            states.print(epoch, batch_idx, (datetime.now() - time).total_seconds())
+    total_loss = test_loss/total
+    score = - total_loss
+    early_stopping(score, network, epoch)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -92,6 +123,7 @@ if __name__ == '__main__':
     best_acc = 0
     best_epoch = 0
     l_states = learningStats()
+    early_stopping = EarlyStopping()
     decayRate = params['Network']['lr_dacay']
     my_lr_scheduler =\
     torch.optim.lr_scheduler.ExponentialLR(optimizer=optimizer,\
@@ -102,8 +134,9 @@ if __name__ == '__main__':
                 params['Network'], params['Layers'], error)
         l_states.training.update()
         my_lr_scheduler.step()
-#        l_states.testing.reset()
-#        test(net, test_loader, e, l_states, params['Network'],\
-#                params['Layers'])
-#        l_states.testing.update()
-#    logging.info("Best Accuracy: %.3f, at epoch: %d \n", best_acc, best_epoch)
+        l_states.testing.reset()
+        test(net, test_loader, e, l_states, params['Network'],\
+                params['Layers'], error, early_stopping)
+        l_states.testing.update()
+        if early_stopping.early_stop:
+            break

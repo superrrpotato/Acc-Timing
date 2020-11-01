@@ -1,6 +1,7 @@
 #import pycuda.driver as cuda
-
-
+import numpy as np
+import os
+import torch
 class learningStat():
     def __init__(self):
         self.lossSum = 0
@@ -63,8 +64,8 @@ class learningStats():
                 self.linesPrinted += 1
         print(epochStr + iterStr + profileStr + lrStr)
         print(self.training.displayString())
-        #print(self.testing.displayString())
-        self.linesPrinted += 3
+        print(self.testing.displayString())
+        self.linesPrinted += 4
         if footer is not None:
             for f in footer:
                 print('\033[2K' + str(f))
@@ -118,3 +119,56 @@ class aboutCudaDevices():
             string += ("          Memory: %.2f GB\n" %\
                     (cuda.Device(i).total_memory() / 1e9))
             return string
+
+
+class EarlyStopping:
+    """Early stops the training if validation loss doesn't improve after a given patience."""
+    def __init__(self, patience=50, verbose=False, delta=0):
+        """
+        Args:
+            patience (int): How long to wait after last time validation loss improved.
+                            Default: 7
+            verbose (bool): If True, prints a message for each validation loss improvement.
+                            Default: False
+            delta (float): Minimum change in the monitored quantity to qualify as an improvement.
+                            Default: 0
+        """
+        self.patience = patience
+        self.verbose = verbose
+        self.counter = 0
+        self.best_score = None
+        self.early_stop = False
+        self.val_min = np.Inf
+        self.delta = delta
+
+    def __call__(self, val, model, epoch):
+
+        score = val
+
+        if self.best_score is None:
+            self.best_score = score
+            self.save_checkpoint(model, val, epoch)
+        elif score < self.best_score + self.delta:
+            self.counter += 1
+            if self.verbose:
+                print(f'EarlyStopping counter: {self.counter} out of {self.patience}')
+            if self.counter >= self.patience:
+                self.early_stop = True
+        else:
+            self.best_score = score
+            self.save_checkpoint(model, val, epoch)
+            self.counter = 0
+
+    def save_checkpoint(self, network, val, epoch):
+        """Saves model when validation loss decrease."""
+        if self.verbose:
+            print(f'Accuracy increased ({self.val_min:.6f} --> {val:.6f}).  Saving model ...')
+        state = {
+            'net': network.state_dict(),
+            'loss': val,
+            'epoch': epoch,
+        }
+        if not os.path.isdir('checkpoint'):
+            os.mkdir('checkpoint')
+        torch.save(state, './checkpoint/ckpt.pth')
+        self.val_min = val

@@ -5,3 +5,4 @@ figs/
 **.swp
 **.ipynb
 .ipynb_checkpoints/
+checkpoint/
