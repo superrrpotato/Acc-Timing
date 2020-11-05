@@ -46,7 +46,7 @@ class Network(nn.Module):
                 {}'.format(self.network_config['rule']))
         if self.network_config['dataset'] == 'XOR':
             spikes = spikes * self.scale + self.bias
-#             print("scale: %3.4f, bias: %3.4f"%(self.scale, self.bias))
+            print("scale: %3.4f, bias: %3.4f"%(self.scale, self.bias))
         return spikes
     def get_parameters(self):
         return self.my_parameters

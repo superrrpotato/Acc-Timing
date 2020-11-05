@@ -15,11 +15,11 @@ class LinearLayer(nn.Linear):
         self.config = config
         assert(type(n_inputs) == int)
         assert(type(n_outputs) == int)
-        super(LinearLayer, self).__init__(n_inputs, n_outputs, bias=False)
+        super(LinearLayer, self).__init__(n_inputs, n_outputs, bias=True)
         nn.init.normal_(self.weight)
-#        nn.init.zeros_(self.bias)
+        nn.init.zeros_(self.bias)+0.1
         self.weight = torch.nn.Parameter(self.weight, requires_grad=True)
-#        self.bias = torch.nn.Parameter(self.bias, requires_grad=True)
+        self.bias = torch.nn.Parameter(self.bias, requires_grad=True)
         print("linear")
         print(name)
         print("input shape:", [glv.batch_size, n_inputs, 1, 1, glv.n_steps])

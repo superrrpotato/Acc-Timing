@@ -22,4 +22,14 @@ Layers:
     layer_name: "FC_2"
     type: "linear"
     n_inputs: 40
-    n_outputs: 1
+    n_outputs: 20
+  FC_3:
+    layer_name: "FC_3"
+    type: "linear"
+    n_inputs: 20
+    n_outputs: 10
+  FC_4:
+    layer_name: "FC_4"
+    type: "linear"
+    n_inputs: 10
+    n_outputs: 10
