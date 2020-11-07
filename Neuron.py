@@ -1,6 +1,8 @@
 import torch
 import global_v as glv
-
+def sigmoid(x, temp):
+    exp = torch.clamp(-x/temp, -10, 10)
+    return 1 / (1 + torch.exp(exp))
 
 def psp(inputs, network_config):
     shape = inputs.shape
@@ -77,17 +79,18 @@ class Neuron(torch.autograd.Function):
                 grad_a[i*mini_batch:(i+1)*mini_batch, ...] =\
                     torch.einsum('...ij, ...j -> ...i',partial_a_inter,\
                         grad_delta[i*mini_batch:(i+1)*mini_batch, ...])
-        if torch.sum(outputs)/(shape[0] * shape[1] * shape[2] * shape[3] *\
-                shape[4]) > 1:
-            partial_u = torch.clamp(1 / delta_u, -10, 10) * outputs
-            grad = grad_a * partial_u
-        else:
-            a = 0.15
-            f = torch.clamp((-1 * u + threshold) / a, -8, 8)
-            f = torch.exp(f)
-            f = f / ((1 + f) * (1 + f) * a)
-            grad = grad_a * f
+        a = 0.2
+        f = torch.clamp((-1 * u + threshold) / a, -8, 8)
+        f = torch.exp(f)
+        f = f / ((1 + f) * (1 + f) * a)
+        grad = grad_a * f
+
+        sig = sigmoid(u-threshold,0.2)
+        inter_u = (1 - glv.theta_m) * ((1 - outputs) - sig * (1 - sig) * u)
+        for t in range(n_steps-2, 0, -1):
+            grad[..., t] += grad[..., t+1] * inter_u[..., t]
         glv.grad_stat[layer_name] = grad
+
         return grad, None
 
 

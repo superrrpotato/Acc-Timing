@@ -17,7 +17,7 @@ class Network(nn.Module):
             if c['type'] == 'linear':
                 self.layers.append(linear.LinearLayer(c, key))
                 self.layers[-1].to(glv.device)
-                parameters.append(self.layers[-1].get_parameters())
+                parameters = parameters + self.layers[-1].get_parameters()
             else:
                 raise Exception('Undefined layer type. It is:\
                 {}'.format(c['type']))

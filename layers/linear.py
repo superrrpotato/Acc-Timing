@@ -37,7 +37,7 @@ class LinearLayer(nn.Linear):
         y = Neuron.Neuron.apply(y, self.config)
         return y
     def get_parameters(self):
-        return self.weight
+        return [self.weight, self.bias]
     def weight_clipper(self):
         w = self.weight.data
         w = w.clamp(-4, 4)

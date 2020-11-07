@@ -5,7 +5,7 @@ from utils import aboutCudaDevices
 def init(params):
     global device, dtype, n_steps, theta_m, theta_s, threshold, partial_a,\
     batch_size, mem_p_stat_ori, output_stat_ori, error_stat, grad_stat,\
-    name_list
+    name_list, dims_dict
     if torch.cuda.is_available():
         device = torch.device("cuda")
         cuda.init()
@@ -33,4 +33,5 @@ def init(params):
     output_stat_ori = {}
     error_stat = {}
     grad_stat = {}
+    dims_dict = {}
     name_list = []
