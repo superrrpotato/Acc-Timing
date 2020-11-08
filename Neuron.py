@@ -65,6 +65,7 @@ class Neuron(torch.autograd.Function):
         threshold = glv.threshold
         glv.error_stat[layer_name] = grad_delta
         grad_a = torch.empty_like(delta_u)
+        """
         if shape[4] > shape[0] * 10:
             for t in range(n_steps):
                 partial_a_inter = glv.partial_a[..., t, :].repeat(shape[0],\
@@ -79,16 +80,19 @@ class Neuron(torch.autograd.Function):
                 grad_a[i*mini_batch:(i+1)*mini_batch, ...] =\
                     torch.einsum('...ij, ...j -> ...i',partial_a_inter,\
                         grad_delta[i*mini_batch:(i+1)*mini_batch, ...])
+        """
+        grad_a = grad_delta
         a = 0.2
         f = torch.clamp((-1 * u + threshold) / a, -8, 8)
         f = torch.exp(f)
         f = f / ((1 + f) * (1 + f) * a)
         grad = grad_a * f
-
+        """
         sig = sigmoid(u-threshold,0.2)
         inter_u = (1 - glv.theta_m) * ((1 - outputs) - sig * (1 - sig) * u)
         for t in range(n_steps-2, 0, -1):
             grad[..., t] += grad[..., t+1] * inter_u[..., t]
+        """
         glv.grad_stat[layer_name] = grad
 
         return grad, None

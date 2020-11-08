@@ -11,7 +11,7 @@ class XORDataset(Dataset):
         label = XOR(x,y)
         return data.view(2,1,1), label
     def __len__(self):
-        return 5000 if self.train else 1000
+        return 500000 if self.train else 100000
 
 def get_XOR(network_config):
     print("loading XOR")
