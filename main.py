@@ -35,6 +35,7 @@ def train(network, trainloader, opti, epoch, states, network_config,\
             opti.zero_grad()
             loss.backward()
             opti.step()
+            network.weight_clipper()
             train_loss += torch.sum(loss).item()
             total += len(labels)
         else:
@@ -140,3 +141,4 @@ if __name__ == '__main__':
         l_states.testing.update()
         if early_stopping.early_stop:
             break
+    l_states.plot(True)

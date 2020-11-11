@@ -2,6 +2,7 @@
 import numpy as np
 import os
 import torch
+import matplotlib.pyplot as plt
 class learningStat():
     def __init__(self):
         self.lossSum = 0

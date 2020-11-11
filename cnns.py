@@ -15,7 +15,7 @@ class Network(nn.Module):
         for key in layers_config:
             c = layers_config[key]
             if c['type'] == 'linear':
-                self.layers.append(linear.LinearLayer(c, key))
+                self.layers.append(linear.LinearLayer(self.network_config, c, key))
                 self.layers[-1].to(glv.device)
                 parameters = parameters + self.layers[-1].get_parameters()
             else:
