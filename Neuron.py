@@ -20,10 +20,10 @@ def psp(inputs, network_config):
 
 class Neuron(torch.autograd.Function):
     @staticmethod
-    def forward(ctx, inputs, theta_m, layer_config):
+    def forward(ctx, inputs, layer_config):
         shape = inputs.shape
         n_steps = glv.n_steps
-#       theta_m = glv.theta_m
+        theta_m = glv.theta_m
         theta_s = glv.theta_s
         threshold = glv.threshold
         mem = torch.zeros((shape[0], shape[1], shape[2], shape[3]),\
@@ -34,13 +34,9 @@ class Neuron(torch.autograd.Function):
         mem_updates = []
         outputs = []
         syns = []
-#        print(shape)
-#        print('mem:',mem.shape)
-#        print('theta:',theta_m.shape)
+
         for t in range(n_steps):
             mem_update = (-theta_m) * mem + inputs[..., t]
-#            print(mem_update.shape)
-#            print(mem.shape)
             mem += mem_update
             out = (mem > threshold).type(glv.dtype)
             mems.append(mem)
@@ -68,7 +64,7 @@ class Neuron(torch.autograd.Function):
         shape = outputs.shape
         n_steps = glv.n_steps
         threshold = glv.threshold
-        glv.error_stat[layer_name] = grad_delta
+#         glv.error_stat[layer_name] = grad_delta
         grad_a = torch.empty_like(delta_u)
 
         if shape[4] > shape[0] * 10:
@@ -87,28 +83,15 @@ class Neuron(torch.autograd.Function):
                         grad_delta[i*mini_batch:(i+1)*mini_batch, ...])
 
         a = 0.2
-        """
+
         f = torch.clamp((-1 * u + threshold) / a, -8, 8)
         f = torch.exp(f)
         f = f / ((1 + f) * (1 + f) * a)
         grad = grad_a * f
-        """
-        sig = sigmoid(u-threshold, a)
-        sig_grad = sig * (1 - sig) / a
-        grad = grad_a * sig_grad
-#        inter_u = (1 - glv.theta_m) * ((1 - outputs) - sig_grad * u)
-#        for t in range(n_steps-2, 0, -1):
-#            grad[..., t] += grad[..., t+1] * inter_u[..., t]
 
-        grad_theta = -grad *\
-            torch.cat((torch.zeros(shape[0], shape[1],\
-            shape[2], shape[3], 1), u[..., 1:]), 4) *\
-            (1 - torch.cat((torch.zeros(shape[0], shape[1],\
-            shape[2], shape[3], 1), outputs[..., 1:]), 4))
-        grad_theta = torch.sum(grad_theta, 4)
-        glv.grad_stat[layer_name] = grad
+#         glv.grad_stat[layer_name] = grad
 
-        return grad, grad_theta, None
+        return grad, None
 
 
 

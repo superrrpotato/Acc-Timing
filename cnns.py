@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 import layers.linear as linear
+import layers.FC as FC
+import torch.nn as nn
 import global_v as glv
 import Neuron as f
 
@@ -16,6 +18,10 @@ class Network(nn.Module):
             c = layers_config[key]
             if c['type'] == 'linear':
                 self.layers.append(linear.LinearLayer(self.network_config, c, key))
+                self.layers[-1].to(glv.device)
+                parameters = parameters + self.layers[-1].get_parameters()
+            elif c['type'] == 'FC':
+                self.layers.append(FC.FCLayer(self.network_config, c, key))
                 self.layers[-1].to(glv.device)
                 parameters = parameters + self.layers[-1].get_parameters()
             else:
@@ -39,7 +45,7 @@ class Network(nn.Module):
             if self.layers[i].type == "dropout":
                 if is_train:
                     spikes = self.layers[i](spikes)
-            elif self.network_config["rule"] == "ATBP":
+            elif self.network_config["rule"] == "BP":
                 spikes = self.layers[i].forward_pass(spikes)
             else:
                 raise Exception('Unrecognized rule type. It is:\

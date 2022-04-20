@@ -8,12 +8,12 @@ parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir)
 import global_v as glv
 
-class LinearLayer(nn.Linear):
+class FCLayer(nn.Linear):
     def __init__(self, Network_cofig, config, name):
-        n_inputs = config['n_inputs']
+        n_inputs = config['n_inputs'] * glv.n_steps
         n_outputs = config['n_outputs']
         self.config = config
-        self.name = 'linear'
+        self.name = 'FC'
         assert(type(n_inputs) == int)
         assert(type(n_outputs) == int)
         super(LinearLayer, self).__init__(n_inputs, n_outputs, bias=True)
@@ -22,24 +22,17 @@ class LinearLayer(nn.Linear):
         self.weight = torch.nn.Parameter(self.weight, requires_grad=True)
         self.bias = torch.nn.Parameter(self.bias, requires_grad=True)
         print(self.bias.shape)
-#         self.theta_m = torch.ones((1,\
-#             n_outputs,1,1), dtype=glv.dtype, device=glv.device) * glv.theta_m
-#         self.theta_m = torch.nn.Parameter(self.theta_m, requires_grad=True)
-        print("linear")
+
+        print("FC")
         print(name)
-        print("input shape:", [glv.batch_size, n_inputs, 1, 1, glv.n_steps])
+        print("input shape:", [glv.batch_size, n_inputs])
         print("weight shape: ", list(self.weight.shape)[::-1])
-        print("output shape:", [glv.batch_size, n_outputs, 1, 1, glv.n_steps])
+        print("output shape:", [glv.batch_size, n_outputs])
         print("-----------------------------------------")
 
     def forward_pass(self, x):
-        x = x.view(x.shape[0], x.shape[1] * x.shape[2] * x.shape[3],\
-            x.shape[4])
-        x = x.transpose(1, 2)
+        x = x.view(-1)
         y = f.linear(x, self.weight, self.bias)
-        y = y.transpose(1, 2)
-        y = y.view(y.shape[0], y.shape[1], 1, 1, y.shape[2])
-        y = Neuron.Neuron.apply(y, self.config)
         return y
     def get_parameters(self):
         return [self.weight, self.bias]
@@ -47,4 +40,4 @@ class LinearLayer(nn.Linear):
         w = self.weight.data
         w = w.clamp(-4, 4)
         self.weight.data = w
-        self.theta_m.data = self.theta_m.data.clamp(0, 1)
+

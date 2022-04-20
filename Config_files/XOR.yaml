@@ -3,7 +3,7 @@ Network:
   batch_size: 10
   n_steps: 50
   dataset: "XOR"
-  rule: "ATBP"
+  rule: "BP"
   data_path: "./datasets/XOR"
   lr: 0.01
   loss: "average"
@@ -28,3 +28,8 @@ Layers:
     type: "linear"
     n_inputs: 128
     n_outputs: 256
+  output:
+    layer_name: "output"
+    type: "FC"
+    n_inputs: 256
+    n_outputs: 1
