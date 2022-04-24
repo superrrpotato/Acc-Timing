@@ -31,7 +31,7 @@ def train(network, trainloader, opti, epoch, states, network_config,\
             outputs = network.forward(inputs, True)
             if network_config['loss'] == "average":
                 target = labels
-                loss = err.average(outputs, target)
+                loss = err.spike_kernel(outputs, target)
             opti.zero_grad()
             loss.backward()
             opti.step()
@@ -67,7 +67,7 @@ def test(network, testloader, epoch, states, network_config, layers_config,\
                 outputs = network.forward(inputs, False)
                 if network_config['loss'] == "average":
                     target = labels
-                    loss = error.average(outputs,\
+                    loss = error.spike_kernel(outputs,\
                             target).detach().cpu()
                 total += len(labels)
                 test_loss += torch.sum(loss).item()

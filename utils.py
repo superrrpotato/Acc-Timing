@@ -65,7 +65,7 @@ class learningStats():
         print(epochStr + iterStr + profileStr + lrStr)
         print(self.training.displayString())
         print(self.testing.displayString())
-        self.linesPrinted += 4
+        self.linesPrinted += 3
         if footer is not None:
             for f in footer:
                 print('\033[2K' + str(f))

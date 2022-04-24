@@ -1,7 +1,7 @@
 Network:
   epochs: 50
   batch_size: 100
-  n_steps: 50
+  n_steps: 2
   dataset: "XOR"
   rule: "ATBP"
   data_path: "./datasets/XOR"
@@ -17,9 +17,9 @@ Layers:
     layer_name: "FC_1"
     type: "linear"
     n_inputs: 2
-    n_outputs: 40
-  FC_2:
-    layer_name: "FC_2"
-    type: "linear"
-    n_inputs: 40
-    n_outputs: 80
+    n_outputs: 800
+  out:
+    layer_name: "out"
+    type: "FC"
+    n_inputs: 800
+    n_outputs: 1

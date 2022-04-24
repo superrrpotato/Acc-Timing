@@ -25,7 +25,7 @@ class SpikeLoss(torch.nn.Module):
         self.network_config = network_config
         self.criterion = torch.nn.CrossEntropyLoss()
     def spike_kernel(self, outputs, target):
-        return 1 / 2 * torch.sum((outputs - target) ** 2)
+        return 1 / 2 * torch.sum((outputs.T - target) ** 2)
     def average(self, outputs, target):
         return 1 / 2 * torch.sum((torch.sum(outputs,(1, 2, 3, 4))/glv.n_steps\
                 - target) **2)
